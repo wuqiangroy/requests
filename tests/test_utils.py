@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+import os
+import copy
 from io import BytesIO
 
 import pytest
@@ -16,7 +18,7 @@ from requests.utils import (
     requote_uri, select_proxy, should_bypass_proxies, super_len,
     to_key_val_list, to_native_string,
     unquote_header_value, unquote_unreserved,
-    urldefragauth, add_dict_to_cookiejar)
+    urldefragauth, add_dict_to_cookiejar, set_environ)
 from requests._internal_utils import unicode_is_ascii
 
 from .compat import StringIO, cStringIO
@@ -366,7 +368,7 @@ def test_get_auth_from_url(url, auth):
         ),
     ))
 def test_requote_uri_with_unquoted_percents(uri, expected):
-    """See: https://github.com/kennethreitz/requests/issues/2356"""
+    """See: https://github.com/requests/requests/issues/2356"""
     assert requote_uri(uri) == expected
 
 
@@ -599,3 +601,80 @@ def test_should_bypass_proxies_no_proxy(
     no_proxy = '192.168.0.0/24,127.0.0.1,localhost.localdomain,172.16.1.1'
     # Test 'no_proxy' argument
     assert should_bypass_proxies(url, no_proxy=no_proxy) == expected
+
+
+@pytest.mark.skipif(os.name != 'nt', reason='Test only on Windows')
+@pytest.mark.parametrize(
+    'url, expected, override', (
+            ('http://192.168.0.1:5000/', True, None),
+            ('http://192.168.0.1/', True, None),
+            ('http://172.16.1.1/', True, None),
+            ('http://172.16.1.1:5000/', True, None),
+            ('http://localhost.localdomain:5000/v1.0/', True, None),
+            ('http://172.16.1.22/', False, None),
+            ('http://172.16.1.22:5000/', False, None),
+            ('http://google.com:5000/v1.0/', False, None),
+            ('http://mylocalhostname:5000/v1.0/', True, '<local>'),
+            ('http://192.168.0.1/', False, ''),
+    ))
+def test_should_bypass_proxies_win_registry(url, expected, override,
+                                            monkeypatch):
+    """Tests for function should_bypass_proxies to check if proxy
+    can be bypassed or not with Windows registry settings
+    """
+    if override is None:
+        override = '192.168.*;127.0.0.1;localhost.localdomain;172.16.1.1'
+    if compat.is_py3:
+        import winreg
+    else:
+        import _winreg as winreg
+
+    class RegHandle:
+        def Close(self):
+            pass
+
+    ie_settings = RegHandle()
+
+    def OpenKey(key, subkey):
+        return ie_settings
+
+    def QueryValueEx(key, value_name):
+        if key is ie_settings:
+            if value_name == 'ProxyEnable':
+                return [1]
+            elif value_name == 'ProxyOverride':
+                return [override]
+
+    monkeypatch.setenv('http_proxy', '')
+    monkeypatch.setenv('https_proxy', '')
+    monkeypatch.setenv('ftp_proxy', '')
+    monkeypatch.setenv('no_proxy', '')
+    monkeypatch.setenv('NO_PROXY', '')
+    monkeypatch.setattr(winreg, 'OpenKey', OpenKey)
+    monkeypatch.setattr(winreg, 'QueryValueEx', QueryValueEx)
+
+
+@pytest.mark.parametrize(
+    'env_name, value', (
+            ('no_proxy', '192.168.0.0/24,127.0.0.1,localhost.localdomain'),
+            ('no_proxy', None),
+            ('a_new_key', '192.168.0.0/24,127.0.0.1,localhost.localdomain'),
+            ('a_new_key', None),
+    ))
+def test_set_environ(env_name, value):
+    """Tests set_environ will set environ values and will restore the environ."""
+    environ_copy = copy.deepcopy(os.environ)
+    with set_environ(env_name, value):
+        assert os.environ.get(env_name) == value
+
+    assert os.environ == environ_copy
+
+
+def test_set_environ_raises_exception():
+    """Tests set_environ will raise exceptions in context when the
+    value parameter is None."""
+    with pytest.raises(Exception) as exception:
+        with set_environ('test1', None):
+            raise Exception('Expected exception')
+
+    assert 'Expected exception' in str(exception.value)

@@ -7,18 +7,15 @@ Requests: HTTP for Humans
 .. image:: https://img.shields.io/pypi/l/requests.svg
     :target: https://pypi.python.org/pypi/requests
 
-.. image:: https://img.shields.io/pypi/wheel/requests.svg
-    :target: https://pypi.python.org/pypi/requests
-
 .. image:: https://img.shields.io/pypi/pyversions/requests.svg
     :target: https://pypi.python.org/pypi/requests
 
-.. image:: https://travis-ci.org/kennethreitz/requests.svg?branch=master
-    :target: https://travis-ci.org/kennethreitz/requests
-
-.. image:: https://codecov.io/github/kennethreitz/requests/coverage.svg?branch=master
-    :target: https://codecov.io/github/kennethreitz/requests
+.. image:: https://codecov.io/github/requests/requests/coverage.svg?branch=master
+    :target: https://codecov.io/github/requests/requests
     :alt: codecov.io
+
+.. image:: https://img.shields.io/github/contributors/requests/requests.svg
+    :target: https://github.com/requests/requests/graphs/contributors
 
 .. image:: https://img.shields.io/badge/Say%20Thanks-!-1EAEDB.svg
     :target: https://saythanks.io/to/kennethreitz
@@ -50,15 +47,14 @@ Behold, the power of Requests:
 
 See `the similar code, sans Requests <https://gist.github.com/973705>`_.
 
-.. image:: https://raw.githubusercontent.com/kennethreitz/requests/master/docs/_static/requests-logo-small.png
+.. image:: https://raw.githubusercontent.com/requests/requests/master/docs/_static/requests-logo-small.png
     :target: http://docs.python-requests.org/
 
 
 Requests allows you to send *organic, grass-fed* HTTP/1.1 requests, without the
 need for manual labor. There's no need to manually add query strings to your
 URLs, or to form-encode your POST data. Keep-alive and HTTP connection pooling
-are 100% automatic, powered by `urllib3 <https://github.com/shazow/urllib3>`_,
-which is embedded within Requests.
+are 100% automatic, thanks to `urllib3 <https://github.com/shazow/urllib3>`_.
 
 Besides, all the cool kids are doing it. Requests is one of the most
 downloaded Python packages of all time, pulling in over 11,000,000 downloads
@@ -84,7 +80,6 @@ Requests is ready for today's web.
 - Streaming Downloads
 - ``.netrc`` Support
 - Chunked Requests
-- Thread-safety
 
 Requests officially supports Python 2.6–2.7 & 3.3–3.7, and runs great on PyPy.
 
@@ -98,7 +93,7 @@ To install Requests, simply:
     $ pip install requests
     ✨🍰✨
 
-Satisfaction, guaranteed.
+Satisfaction guaranteed.
 
 Documentation
 -------------
@@ -114,6 +109,6 @@ How to Contribute
 #. Write a test which shows that the bug was fixed or that the feature works as expected.
 #. Send a pull request and bug the maintainer until it gets merged and published. :) Make sure to add yourself to AUTHORS_.
 
-.. _`the repository`: http://github.com/kennethreitz/requests
-.. _AUTHORS: https://github.com/kennethreitz/requests/blob/master/AUTHORS.rst
-.. _Contributor Friendly: https://github.com/kennethreitz/requests/issues?direction=desc&labels=Contributor+Friendly&page=1&sort=updated&state=open
+.. _`the repository`: http://github.com/requests/requests
+.. _AUTHORS: https://github.com/requests/requests/blob/master/AUTHORS.rst
+.. _Contributor Friendly: https://github.com/requests/requests/issues?direction=desc&labels=Contributor+Friendly&page=1&sort=updated&state=open
